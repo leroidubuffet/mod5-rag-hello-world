@@ -1,0 +1,32 @@
+# Docker Compose para la variante con ChromaDB (opcional).
+# Ver el apartado "Variante con ChromaDB" del README para instrucciones completas.
+#
+# Uso rapido:
+#   docker compose up -d
+#   curl http://localhost:8000/api/v1/heartbeat   # debe devolver {"nanosecond heartbeat": ...}
+#
+# Para detener (conservando los datos):
+#   docker compose down
+#
+# Para detener y borrar el volumen:
+#   docker compose down -v
+
+services:
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: mod5-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chromadb-data:/data
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  chromadb-data:
