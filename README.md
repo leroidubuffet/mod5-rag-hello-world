@@ -89,13 +89,13 @@ Los scores varían entre ejecuciones porque dependen del chunking y del modelo d
 
 ## Experimentos sugeridos
 
-Las constantes al principio de `HelloRag.java` son los puntos de entrada para experimentar:
+El archivo `src/main/resources/application.properties` es el punto de entrada para experimentar sin tocar el código:
 
-```java
-private static final int    CHUNK_SIZE    = 300;
-private static final int    CHUNK_OVERLAP = 30;
-private static final int    K             = 3;
-private static final double MIN_SCORE     = 0.5;
+```properties
+rag.chunk.size=300
+rag.chunk.overlap=30
+rag.retrieval.k=3
+rag.retrieval.min_score=0.5
 ```
 
 | Experimento | Cambio | Qué observar |
