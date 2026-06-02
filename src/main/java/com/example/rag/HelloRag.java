@@ -28,6 +28,7 @@ public class HelloRag {
         int k = Integer.parseInt(props.getProperty("rag.retrieval.k", "3"));
         double minScore = Double.parseDouble(props.getProperty("rag.retrieval.min_score", "0.5"));
         String chatModelName = props.getProperty("rag.model.chat", "claude-haiku-4-5-20251001");
+        boolean showPrompt = Boolean.parseBoolean(props.getProperty("rag.debug.show_prompt", "false"));
 
         // 1. Inicializar modelos y almacenamiento
         EmbeddingModel embeddingModel = new BgeSmallEnV15EmbeddingModel();
@@ -40,7 +41,7 @@ public class HelloRag {
         // 2. Inicializar servicios
         IngestionService ingestionService = new IngestionService(embeddingModel, store);
         RetrievalService retrievalService = new RetrievalService(embeddingModel, store);
-        GenerationService generationService = new GenerationService(chatModel);
+        GenerationService generationService = new GenerationService(chatModel, showPrompt);
 
         // 3. Fase 1: INDEXACION
         ingestionService.indexDocuments(Path.of("corpus"), chunkSize, chunkOverlap);

@@ -3,6 +3,8 @@ package com.example.rag;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -11,14 +13,26 @@ import java.util.List;
  */
 public class GenerationService {
 
-    private final ChatModel chatModel;
+    private static final Logger log = LoggerFactory.getLogger(GenerationService.class);
 
-    public GenerationService(ChatModel chatModel) {
+    private final ChatModel chatModel;
+    private final boolean showPrompt;
+
+    public GenerationService(ChatModel chatModel, boolean showPrompt) {
         this.chatModel = chatModel;
+        this.showPrompt = showPrompt;
     }
 
     public String generateAnswer(String question, List<EmbeddingMatch<TextSegment>> matches) {
         String prompt = buildPrompt(matches, question);
+
+        if (showPrompt) {
+            System.out.println("\n[DEBUG] PROMPT ENSAMBLADO:");
+            System.out.println("-".repeat(70));
+            System.out.println(prompt);
+            System.out.println("-".repeat(70));
+        }
+
         return chatModel.chat(prompt);
     }
 
