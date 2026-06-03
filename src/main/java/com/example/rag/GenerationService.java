@@ -1,24 +1,20 @@
 package com.example.rag;
 
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Fase 3 — ENSAMBLADO y Fase 4 — GENERACION.
- */
+@Service
 public class GenerationService {
 
-    private static final Logger log = LoggerFactory.getLogger(GenerationService.class);
-
-    private final ChatModel chatModel;
+    private final ChatLanguageModel chatModel;
     private final boolean showPrompt;
 
-    public GenerationService(ChatModel chatModel, boolean showPrompt) {
+    public GenerationService(ChatLanguageModel chatModel, @Value("${rag.debug.show_prompt:false}") boolean showPrompt) {
         this.chatModel = chatModel;
         this.showPrompt = showPrompt;
     }
@@ -32,7 +28,7 @@ public class GenerationService {
             System.out.println("-------------------------------------------------------------------------------------------------");
         }
 
-        return chatModel.chat(prompt);
+        return chatModel.generate(prompt);
     }
 
     private String buildPrompt(List<EmbeddingMatch<TextSegment>> matches, String question) {

@@ -9,78 +9,49 @@
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.0</version>
+        <relativePath/>
+    </parent>
+
     <properties>
-        <maven.compiler.release>21</maven.compiler.release>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <langchain4j.version>0.36.2</langchain4j.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <!--
-                BOM de LangChain4j: gestiona versiones compatibles entre el nucleo
-                y todos los modulos de integracion. Actualizar aqui afecta a todos.
-            -->
-            <dependency>
-                <groupId>dev.langchain4j</groupId>
-                <artifactId>langchain4j-bom</artifactId>
-                <version>1.0.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
-        <!-- Nucleo de LangChain4j: Document, EmbeddingStore, splitters -->
+        <!-- Spring Boot Starter -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- LangChain4j -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j</artifactId>
+            <version>${langchain4j.version}</version>
         </dependency>
-
-        <!-- Conector para la API de Anthropic (modelo de chat) -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-anthropic</artifactId>
+            <version>${langchain4j.version}</version>
         </dependency>
-
-        <!--
-            Embeddings BGE-small-en-v1.5 ejecutados en proceso (sin API externa).
-            El modelo ONNX (~25 MB) viaja como recurso dentro del JAR; la primera
-            ejecucion lo extrae a una carpeta temporal. Las siguientes son inmediatas.
-        -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-embeddings-bge-small-en-v15</artifactId>
+            <version>${langchain4j.version}</version>
         </dependency>
-
-        <!-- Logging minimo para silenciar el warning de SLF4J en consola -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.17</version>
-        </dependency>
-
-        <!--
-            Variante con ChromaDB: descomentar esta dependencia y seguir las
-            instrucciones del apartado "Variante con ChromaDB" del README.
-        -->
-        <!--
-        <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-chroma</artifactId>
-        </dependency>
-        -->
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <mainClass>com.example.rag.HelloRag</mainClass>
-                </configuration>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
