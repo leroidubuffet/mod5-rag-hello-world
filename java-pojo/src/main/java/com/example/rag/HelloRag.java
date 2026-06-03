@@ -11,6 +11,7 @@ import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
@@ -38,10 +39,13 @@ public class HelloRag {
                 .modelName(chatModelName)
                 .build();
 
-        // 2. Inicializar servicios
+        // 2. Cargar prompt de sistema
+        String systemInstruction = loadSystemPrompt();
+
+        // 3. Inicializar servicios
         IngestionService ingestionService = new IngestionService(embeddingModel, store);
         RetrievalService retrievalService = new RetrievalService(embeddingModel, store);
-        GenerationService generationService = new GenerationService(chatModel, showPrompt);
+        GenerationService generationService = new GenerationService(chatModel, showPrompt, systemInstruction);
 
         // 3. Fase 1: INDEXACION
         ingestionService.indexDocuments(Path.of("corpus"), chunkSize, chunkOverlap);
@@ -93,6 +97,21 @@ public class HelloRag {
             System.err.println("(!) Error cargando application.properties: " + ex.getMessage());
         }
         return props;
+    }
+
+    private static String loadSystemPrompt() {
+        Path path = Path.of("system_prompt.txt");
+        if (!Files.exists(path)) {
+            path = Path.of("../system_prompt.txt");
+        }
+        if (!Files.exists(path)) {
+            path = Path.of("../../system_prompt.txt");
+        }
+        try {
+            return Files.readString(path).strip();
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo leer el archivo system_prompt.txt en " + path.toAbsolutePath(), e);
+        }
     }
 
     private static String requireEnv(String name) {

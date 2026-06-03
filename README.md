@@ -31,30 +31,41 @@ Primero, exporta tu clave de API en la terminal:
 export ANTHROPIC_API_KEY=sk-ant-your-key-here
 ```
 
+Además, puedes modificar las instrucciones del sistema editando el archivo [system_prompt.txt](./system_prompt.txt) en la raíz del repositorio. Todos los programas cargarán estas reglas al iniciar.
+
 ### Variante 1: Java Puro (POJO)
 ```bash
 cd java-pojo
+# Modo Lote (Preguntas prefijadas)
 mvn clean compile exec:java
+
+# Modo Chat Interactivo
+mvn clean compile exec:java -Dexec.mainClass="com.example.rag.HelloRagChat"
 ```
 
 ### Variante 2: Spring Boot 3
 ```bash
 cd java-springboot
+# Modo Lote (Preguntas prefijadas - por defecto)
 mvn clean compile spring-boot:run
+
+# Modo Chat Interactivo
+mvn clean compile spring-boot:run -Dspring-boot.run.arguments="--rag.mode=chat"
 ```
 
 ### Variante 3: Python
 ```bash
 cd python
-# Crear y activar entorno virtual
+# Crear y activar entorno virtual (solo la primera vez)
 python3 -m venv venv
 source venv/bin/activate
-
-# Instalar dependencias
 pip install -r requirements.txt
 
-# Ejecutar el script
+# Modo Lote (Preguntas prefijadas)
 python hello_rag.py
+
+# Modo Chat Interactivo
+python hello_rag_chat.py
 ```
 
 ---

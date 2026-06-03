@@ -93,14 +93,17 @@ def main():
     print(f"Indexados {len(chunks)} vectores en memoria.")
     print("¡Sistema RAG listo! Escribe 'salir' o 'exit' para terminar.\n")
 
-    # 3. Inicializar historial de chat
+    # 3. Inicializar historial de chat y leer prompt de sistema
     chat_history = []
-    system_instruction = (
-        "Eres un asistente virtual de atención al cliente de 'Casa Tortuga'. "
-        "Responde a las preguntas del usuario basándote ÚNICAMENTE en la información explícita que se encuentra dentro de las etiquetas <context>.\n\n"
-        "Si la respuesta no se puede deducir directamente del contexto, debes responder estrictamente con la frase literal: \"No tengo esa información en el corpus.\"\n\n"
-        "Es obligatorio que justifiques tu respuesta citando el id y la fuente del documento que sustenta tu afirmación (por ejemplo: [doc id=\"1\" source=\"archivo.md\"]). Sé conciso y directo."
-    )
+    system_prompt_path = os.path.join(script_dir, "..", "system_prompt.txt")
+    try:
+        with open(system_prompt_path, "r", encoding="utf-8") as f:
+            system_instruction = f.read().strip()
+    except Exception as e:
+        raise FileNotFoundError(f"No se pudo leer el archivo de prompt de sistema en {system_prompt_path}: {e}")
+
+    # Le añadimos la definición de persona al inicio
+    system_instruction = f"Eres un asistente virtual de atención al cliente de 'Casa Tortuga'.\n\n{system_instruction}"
 
     # Bucle de conversación
     while True:

@@ -17,10 +17,12 @@ public class GenerationService {
 
     private final ChatModel chatModel;
     private final boolean showPrompt;
+    private final String systemInstruction;
 
-    public GenerationService(ChatModel chatModel, boolean showPrompt) {
+    public GenerationService(ChatModel chatModel, boolean showPrompt, String systemInstruction) {
         this.chatModel = chatModel;
         this.showPrompt = showPrompt;
+        this.systemInstruction = systemInstruction;
     }
 
     public String generateAnswer(String question, List<EmbeddingMatch<TextSegment>> matches) {
@@ -52,10 +54,8 @@ public class GenerationService {
         sb.append("<question>\n").append(question).append("\n</question>\n\n");
 
         sb.append("<instructions>\n")
-                .append("Responde a la pregunta planteada basándote ÚNICAMENTE en la información explícita que se encuentra dentro de las etiquetas <context>.\n\n")
-                .append("Si la respuesta no se puede deducir directamente del contexto proporcionado, debes responder estrictamente con la siguiente frase literal: \"No tengo esa información en el corpus.\"\n\n")
-                .append("Es obligatorio que justifiques tu respuesta citando textualmente el id y la fuente del documento que sustenta tu afirmación (por ejemplo: [doc id=\"1\" source=\"archivo.md\"]). Sé conciso y directo en tu respuesta.\n")
-                .append("</instructions>");
+                .append(systemInstruction)
+                .append("\n</instructions>");
 
         return sb.toString();
     }

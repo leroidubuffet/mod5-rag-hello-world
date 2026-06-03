@@ -61,7 +61,15 @@ def main():
     vector_store.add_documents(chunks)
     print(f"Indexados {len(chunks)} vectores\n")
 
-    # 3. Consultas a realizar
+    # 3. Leer prompt de sistema
+    system_prompt_path = os.path.join(script_dir, "..", "system_prompt.txt")
+    try:
+        with open(system_prompt_path, "r", encoding="utf-8") as f:
+            system_instruction = f.read().strip()
+    except Exception as e:
+        raise FileNotFoundError(f"No se pudo leer el archivo de prompt de sistema en {system_prompt_path}: {e}")
+
+    # 4. Consultas a realizar
     questions = [
         "Cuanto cuesta enviar a Madrid?",
         "Cuantos dias tengo para devolver un producto?",
@@ -103,10 +111,8 @@ def main():
             "".join(context_parts)
             + f"<question>\n{question}\n</question>\n\n"
             + "<instructions>\n"
-              "Responde a la pregunta planteada basándote ÚNICAMENTE en la información explícita que se encuentra dentro de las etiquetas <context>.\n\n"
-              "Si la respuesta no se puede deducir directamente del contexto proporcionado, debes responder estrictamente con la siguiente frase literal: \"No tengo esa información en el corpus.\"\n\n"
-              "Es obligatorio que justifiques tu respuesta citando textualmente el id y la fuente del documento que sustenta tu afirmación (por ejemplo: [doc id=\"1\" source=\"archivo.md\"]). Sé conciso y directo en tu respuesta.\n"
-              "</instructions>"
+            + system_instruction
+            + "\n</instructions>"
         )
 
         if SHOW_PROMPT:
