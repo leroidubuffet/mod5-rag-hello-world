@@ -45,7 +45,7 @@ cd mod5-rag-hello-world
 export ANTHROPIC_API_KEY=sk-ant-...
 
 # 3. Compilar y ejecutar
-mvn -q exec:java
+mvn compile exec:java -q
 ```
 
 La primera ejecución descarga el modelo de embeddings BGE (~25 MB como recurso del JAR vía Maven). Las siguientes son inmediatas.
