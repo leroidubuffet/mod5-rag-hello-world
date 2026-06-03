@@ -4,7 +4,7 @@ import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.anthropic.AnthropicChatModel;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.embedding.onnx.bgesmallenv15.BgeSmallEnV15EmbeddingModel;
+import dev.langchain4j.model.embedding.onnx.bgesmallzhv15q.BgeSmallZhV15QuantizedEmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.inmemory.InMemoryEmbeddingStore;
@@ -32,7 +32,7 @@ public class HelloRag {
         boolean showPrompt = Boolean.parseBoolean(props.getProperty("rag.debug.show_prompt", "false"));
 
         // 1. Inicializar modelos y almacenamiento
-        EmbeddingModel embeddingModel = new BgeSmallEnV15EmbeddingModel();
+        EmbeddingModel embeddingModel = new BgeSmallZhV15QuantizedEmbeddingModel();
         EmbeddingStore<TextSegment> store = new InMemoryEmbeddingStore<>();
         ChatModel chatModel = AnthropicChatModel.builder()
                 .apiKey(requireEnv("ANTHROPIC_API_KEY"))
