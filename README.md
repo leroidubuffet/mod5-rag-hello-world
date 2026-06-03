@@ -2,9 +2,6 @@
 
 Pipeline RAG mínimo en Java con LangChain4j. Implementa las cuatro fases del módulo 5 del curso *IA generativa en el desarrollo de software* en una sola clase, con un corpus de ejemplo incluido.
 
-> **Opcional.** Este repositorio acompaña al módulo 5 del curso (conceptual).
-> No es entregable ni se evalúa. Está pensado para alumnos que quieran ver el pipeline correr antes del módulo 6.
-
 ---
 
 ## Versiones del proyecto
