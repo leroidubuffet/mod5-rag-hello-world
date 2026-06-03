@@ -129,7 +129,7 @@ Por defecto el store es en memoria (`InMemoryEmbeddingStore`): los vectores no p
 
 ```bash
 docker compose up -d
-curl http://localhost:8000/api/v1/heartbeat   # debe responder
+curl http://localhost:8000/api/v2/heartbeat   # debe responder
 ```
 
 **2. Descomentar la dependencia en `pom.xml`:**
