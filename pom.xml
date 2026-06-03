@@ -45,12 +45,12 @@
         </dependency>
 
         <!--
-            Embeddings BGE-small-zh-v1.5 ejecutados en proceso (sin API externa).
+            Embeddings BGE-small-en-v1.5 ejecutados en proceso (sin API externa).
             El modelo ONNX quantized viaja como recurso dentro del JAR.
         -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-embeddings-bge-small-zh-v15-q</artifactId>
+            <artifactId>langchain4j-embeddings-bge-small-en-v15-q</artifactId>
         </dependency>
 
         <!-- Logging minimo para silenciar el warning de SLF4J en consola -->
