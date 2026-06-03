@@ -7,6 +7,22 @@ Pipeline RAG mínimo en Java con LangChain4j. Implementa las cuatro fases del m�
 
 ---
 
+## Versiones del proyecto
+
+Este repositorio contiene dos implementaciones del mismo pipeline RAG para facilitar el aprendizaje progresivo:
+
+| Rama | Enfoque | Ideal para... |
+|---|---|---|
+| `main` | **Java Puro (POJO)** | Entender las bases sin abstracciones. Todo se inicializa manualmente. |
+| `feature/spring-boot-migration` | **Spring Boot 3** | Ver cómo escalar el pipeline a una aplicación profesional y empresarial. |
+
+Para cambiar a la versión de Spring Boot:
+```bash
+git checkout feature/spring-boot-migration
+```
+
+---
+
 ## Requisitos
 
 | Herramienta | Versión mínima |
