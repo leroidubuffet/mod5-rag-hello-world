@@ -46,7 +46,9 @@ def main():
 
     # 2. Fase 1: INDEXACIÓN
     print("Cargando documentos...")
-    raw_docs = load_documents("corpus")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    corpus_dir = os.path.join(script_dir, "..", "corpus")
+    raw_docs = load_documents(corpus_dir)
     print(f"Cargados {len(raw_docs)} documentos del corpus")
 
     splitter = RecursiveCharacterTextSplitter(
