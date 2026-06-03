@@ -1,202 +1,121 @@
 # mod5-rag-hello-world
 
-Pipeline RAG mínimo en Java con LangChain4j. Implementa las cuatro fases del módulo 5 del curso *IA generativa en el desarrollo de software* en una sola clase, con un corpus de ejemplo incluido.
+Pipeline RAG mínimo implementado en **Java (con LangChain4j)** y **Python (con LangChain)**. Implementa las cuatro fases del módulo 5 del curso *IA generativa en el desarrollo de software*, utilizando un corpus de ejemplo compartido.
 
 ---
 
-## Versiones del proyecto
+## Estructura del repositorio
 
-Este repositorio contiene dos implementaciones del mismo pipeline RAG para facilitar el aprendizaje progresivo:
+Este repositorio está organizado como un monorrep para permitir la comparación directa y el aprendizaje progresivo de las diferentes tecnologías:
 
-| Rama | Enfoque | Ideal para... |
-|---|---|---|
-| `main` | **Java Puro (POJO)** | Entender las bases sin abstracciones. Todo se inicializa manualmente. |
-| `feature/spring-boot-migration` | **Spring Boot 3** | Ver cómo escalar el pipeline a una aplicación profesional y empresarial. |
-
-Para cambiar a la versión de Spring Boot:
-```bash
-git checkout feature/spring-boot-migration
-```
+| Carpeta | Enfoque | Tecnología | Características |
+|---|---|---|---|
+| [`java-pojo/`](./java-pojo) | **Java Puro (POJO)** | Java 21 + Maven | Todo se inicializa manualmente. Ideal para entender el flujo básico sin abstracciones. |
+| [`java-springboot/`](./java-springboot) | **Spring Boot 3** | Java 21 + Spring Boot 3 | Estructura empresarial con inyección de dependencias, beans de configuración y properties externalizados. |
+| [`python/`](./python) | **Python 3** | Python 3.10+ + LangChain | Implementación ágil y directa con las bibliotecas estándar de LangChain en Python. |
 
 ---
 
 ## Requisitos
 
-| Herramienta | Versión mínima |
-|---|---|
-| JDK | 21 |
-| Maven | 3.9 |
-
-**API key de Anthropic.** Necesitas una clave con acceso a Claude Haiku.
+- **API key de Anthropic**: Necesitas una clave con acceso a Claude Haiku.
+- **JDK 21** y **Maven 3.9+** (para las versiones de Java).
+- **Python 3.10+** (para la versión de Python).
 
 ---
 
-## Configuración
+## Configuración y Ejecución
 
+Primero, exporta tu clave de API en la terminal:
 ```bash
-# 1. Clonar
-git clone https://github.com/leroidubuffet/mod5-rag-hello-world.git
-cd mod5-rag-hello-world
-
-# 2. Exportar la API key (nunca la pongas en el código ni en el pom.xml)
-export ANTHROPIC_API_KEY=sk-ant-...
-
-# 3. Compilar y ejecutar
-mvn -q exec:java
+export ANTHROPIC_API_KEY=sk-ant-your-key-here
 ```
 
-La primera ejecución descarga el modelo de embeddings BGE (~25 MB como recurso del JAR vía Maven). Las siguientes son inmediatas.
+### Variante 1: Java Puro (POJO)
+```bash
+cd java-pojo
+mvn clean compile exec:java
+```
+
+### Variante 2: Spring Boot 3
+```bash
+cd java-springboot
+mvn clean compile spring-boot:run
+```
+
+### Variante 3: Python
+```bash
+cd python
+# Crear y activar entorno virtual
+python3 -m venv venv
+source venv/bin/activate
+
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Ejecutar el script
+python hello_rag.py
+```
 
 ---
 
-## Qué hace
+## Qué hace el programa
 
-El programa recorre tres preguntas sobre las políticas ficticias de "Casa Tortuga" y para cada una ejecuta las cuatro fases del pipeline:
+El pipeline procesa tres preguntas sobre las políticas internas de la tienda de ejemplo **"Casa Tortuga"**:
+1. *¿Cuánto cuesta enviar a Madrid?* (Respuesta directa en un documento de envíos)
+2. *¿Cuántos días tengo para devolver un producto?* (Respuesta directa en políticas de devoluciones)
+3. *¿Aceptan pago contra reembolso a Tenerife?* (Pregunta capciosa: el reembolso existe pero no aplica a Canarias)
 
-```
-Fase 1 — INDEXACIÓN (una vez al arrancar)
-  corpus/*.md → chunks → embeddings → store en memoria
-
-Fase 2 — RECUPERACIÓN (por pregunta)
-  pregunta → embedding → búsqueda top-k en el store
-
-Fase 3 — ENSAMBLADO
-  fragmentos recuperados + pregunta → prompt con bloques XML
-
-Fase 4 — GENERACIÓN
-  prompt → Claude Haiku → respuesta con cita de fuente
-```
-
-Las tres preguntas están diseñadas para cubrir casos distintos:
-
-| Pregunta | Caso |
-|---|---|
-| ¿Cuánto cuesta enviar a Madrid? | Respuesta directa en un documento |
-| ¿Cuántos días tengo para devolver un producto? | Respuesta en otro documento |
-| ¿Aceptan pago contra reembolso a Tenerife? | Capciosa: el reembolso existe pero no aplica a Canarias |
-
-### Output esperado
-
-```
-Cargados 3 documentos del corpus
-Generados 20 chunks (tamano=300, overlap=30)
-Indexados 20 vectores
-
-======================================================================
-PREGUNTA: Cuanto cuesta enviar a Madrid?
-======================================================================
-Fragmentos recuperados:
-  [1] score=0.852  ## Envio gratuito  Los pedidos con importe superior a 49 EUR (sin c...
-  [2] score=0.847  ## Como solicitar la devolucion
-  [3] score=0.835  - Madrid, Barcelona, Valencia, Sevilla: 4,90 EUR para paquetes de h...
-
-RESPUESTA:
-Según la información proporcionada, enviar a Madrid cuesta **4,90 EUR para paquetes de hasta 5 kg**. [doc id="3" source="envios.md"]
-
-...
-```
-
-Los scores varían entre ejecuciones porque dependen del chunking y del modelo de embedding; el texto exacto de las respuestas varía porque el LLM no es determinista.
+### Flujo del RAG (4 Fases)
+1. **Fase 1 — Indexación (al arrancar)**: Carga los documentos markdown de la carpeta raíz `/corpus`, los divide en chunks de 300 caracteres (overlap de 30), genera embeddings locales con el modelo BGE-small-en-v1.5 y los guarda en un store en memoria.
+2. **Fase 2 — Recuperación (por pregunta)**: Genera el embedding de la pregunta y busca los top-3 fragmentos más similares.
+3. **Fase 3 — Ensamblado**: Agrupa los fragmentos recuperados con la pregunta en un prompt delimitado por etiquetas XML.
+4. **Fase 4 — Generación**: Envía el prompt a Claude Haiku y retorna la respuesta final justificando la fuente.
 
 ---
 
-## Experimentos sugeridos
+## Variante con ChromaDB (Persistencia Real)
 
-El archivo `src/main/resources/application.properties` es el punto de entrada para experimentar sin tocar el código:
+Por defecto, todas las implementaciones usan almacenamiento en memoria (`InMemoryEmbeddingStore`). Para persistir los vectores usando **ChromaDB**:
 
-```properties
-rag.chunk.size=300
-rag.chunk.overlap=30
-rag.retrieval.k=3
-rag.retrieval.min_score=0.5
-```
-
-| Experimento | Cambio | Qué observar |
-|---|---|---|
-| Chunks grandes | `CHUNK_SIZE = 1000` | Los scores bajan; la señal se diluye entre tokens irrelevantes |
-| Chunks pequeños | `CHUNK_SIZE = 80` | Los chunks pierden contexto; el modelo falla en preguntas que cruzan frases |
-| Top-1 | `K = 1` | Si el top-1 es incorrecto, el sistema falla sin alternativa |
-| Filtro estricto | `MIN_SCORE = 0.8` | El sistema responde "no tengo esa información" para la mayoría de preguntas |
-| Pregunta fuera de corpus | Añadir `"Cuantos rinocerontes hay en Africa?"` a la lista | El modelo debe responder con la frase literal del prompt |
-
----
-
-## Variante con ChromaDB
-
-Por defecto el store es en memoria (`InMemoryEmbeddingStore`): los vectores no persisten entre ejecuciones. Para usar ChromaDB con persistencia real:
-
-**1. Levantar ChromaDB:**
-
+### 1. Levantar ChromaDB localmente
 ```bash
 docker compose up -d
-curl http://localhost:8000/api/v2/heartbeat   # debe responder
+curl http://localhost:8000/api/v1/heartbeat   # debe responder
 ```
 
-**2. Descomentar o añadir la dependencia en `pom.xml`:**
+### 2. Configurar el código según tu variante:
 
-Descomenta el bloque correspondiente en el archivo `pom.xml` o añádelo sin especificar versión (ya que está gestionada por el BOM de LangChain4j):
+#### En Java POJO (`java-pojo`):
+- Descomenta la dependencia `langchain4j-chroma` en `java-pojo/pom.xml`.
+- Sustituye la instanciación de `store` en `java-pojo/src/main/java/com/example/rag/HelloRag.java` para usar `ChromaEmbeddingStore.builder()`.
 
-```xml
-<dependency>
-    <groupId>dev.langchain4j</groupId>
-    <artifactId>langchain4j-chroma</artifactId>
-</dependency>
-```
+#### En Java Spring Boot (`java-springboot`):
+- Descomenta o añade la dependencia `langchain4j-chroma` en `java-springboot/pom.xml`.
+- Modifica el `@Bean` de `embeddingStore()` en `java-springboot/src/main/java/com/example/rag/RagConfig.java`:
+  ```java
+  @Bean
+  public EmbeddingStore<TextSegment> embeddingStore() {
+      return ChromaEmbeddingStore.builder()
+              .baseUrl("http://localhost:8000")
+              .collectionName("casa-tortuga")
+              .build();
+  }
+  ```
 
-**3. Sustituir el store en `HelloRag.java`:**
-
-```java
-// Antes:
-EmbeddingStore<TextSegment> store = new InMemoryEmbeddingStore<>();
-
-// Después:
-EmbeddingStore<TextSegment> store = ChromaEmbeddingStore.builder()
-        .baseUrl("http://localhost:8000")
-        .collectionName("casa-tortuga")
-        .build();
-```
-
-**4. Añadir el import:**
-
-```java
-import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
-```
-
-**5. Reejecutar:**
-
-```bash
-mvn -q exec:java
-```
-
-El comportamiento es idéntico desde el código. La diferencia es que ahora los vectores persisten en el volumen Docker entre ejecuciones y se pueden inspeccionar vía la API HTTP de ChromaDB (`GET http://localhost:8000/api/v1/collections`).
-
-Esto ilustra la promesa de la abstracción `EmbeddingStore` de LangChain4j: cambiar la implementación del store no requiere tocar el resto del pipeline.
+#### En Python (`python`):
+- Instala la biblioteca de ChromaDB (`pip install chromadb`).
+- Sustituye el uso de `InMemoryVectorStore` en `python/hello_rag.py` por el cliente de ChromaDB de LangChain:
+  ```python
+  from langchain_chroma import Chroma
+  vector_store = Chroma(
+      collection_name="casa-tortuga",
+      embedding_function=embeddings,
+      persist_directory="./chroma_db"
+  )
+  ```
 
 ---
-
-## Qué NO hace este proyecto
-
-- **Sin re-ranking.** La recuperación va directa a top-k por similitud coseno.
-- **Sin query rewriting** ni decisión de cuándo no recuperar (recupera siempre).
-- **Sin evaluación automática.** La calidad se juzga leyendo las respuestas. La evaluación automatizada con métricas de RAG se verá en el módulo 8.
-
-Estas extensiones son el paso natural siguiente. La [documentación de LangChain4j sobre RAG](https://docs.langchain4j.dev/tutorials/rag) y el [Anthropic cookbook](https://github.com/anthropics/anthropic-cookbook) las cubren en detalle.
-
----
-
-## Estructura del proyecto
-
-```
-mod5-rag-hello-world/
-├── corpus/
-│   ├── envios.md          políticas de envío de Casa Tortuga
-│   ├── devoluciones.md    políticas de devolución
-│   └── pagos.md           métodos de pago
-├── src/main/java/com/example/rag/
-│   └── HelloRag.java      pipeline completo en una clase (~200 líneas)
-├── docker-compose.yml     variante ChromaDB (opcional)
-└── pom.xml
-```
 
 ## Licencia
 
