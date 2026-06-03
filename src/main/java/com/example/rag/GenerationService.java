@@ -27,10 +27,9 @@ public class GenerationService {
         String prompt = buildPrompt(matches, question);
 
         if (showPrompt) {
-            System.out.println("\n[DEBUG] PROMPT ENSAMBLADO:");
-            System.out.println("-".repeat(70));
+            System.out.println("\n------------------------------ PROMPT ENSAMBLADO ENVIADO AL MODELO ------------------------------");
             System.out.println(prompt);
-            System.out.println("-".repeat(70));
+            System.out.println("-------------------------------------------------------------------------------------------------");
         }
 
         return chatModel.chat(prompt);
@@ -53,11 +52,9 @@ public class GenerationService {
         sb.append("<question>\n").append(question).append("\n</question>\n\n");
 
         sb.append("<instructions>\n")
-                .append("Responde la pregunta basandote UNICAMENTE en los documentos del bloque\n")
-                .append("context. Si la respuesta no esta alli, responde literalmente:\n")
-                .append("\"No tengo esa informacion en el corpus.\"\n")
-                .append("Cita el id del documento que sustenta tu afirmacion.\n")
-                .append("Se conciso: maximo dos frases.\n")
+                .append("Responde a la pregunta planteada basándote ÚNICAMENTE en la información explícita que se encuentra dentro de las etiquetas <context>.\n\n")
+                .append("Si la respuesta no se puede deducir directamente del contexto proporcionado, debes responder estrictamente con la siguiente frase literal: \"No tengo esa información en el corpus.\"\n\n")
+                .append("Es obligatorio que justifiques tu respuesta citando textualmente el id y la fuente del documento que sustenta tu afirmación (por ejemplo: [doc id=\"1\" source=\"archivo.md\"]). Sé conciso y directo en tu respuesta.\n")
                 .append("</instructions>");
 
         return sb.toString();

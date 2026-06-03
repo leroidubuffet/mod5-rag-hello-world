@@ -69,11 +69,10 @@ public class HelloRag {
             System.out.println("Fragmentos recuperados:");
             for (int i = 0; i < matches.size(); i++) {
                 EmbeddingMatch<TextSegment> m = matches.get(i);
-                String source = m.embedded().metadata().getString("file_name");
                 String preview = m.embedded().text().replace("\n", " ");
                 if (preview.length() > 70) preview = preview.substring(0, 67) + "...";
-                System.out.printf("  [%d] score=%.3f  src=%-18s  %s%n",
-                        i + 1, m.score(), source, preview);
+                System.out.printf("  [%d] score=%.3f  %s%n",
+                        i + 1, m.score(), preview);
             }
 
             // Fase 3 y 4: GENERACION
