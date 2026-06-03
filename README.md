@@ -79,19 +79,19 @@ Las tres preguntas están diseñadas para cubrir casos distintos:
 
 ```
 Cargados 3 documentos del corpus
-Generados 5 chunks (tamano=300, overlap=30)
-Indexados 5 vectores
+Generados 20 chunks (tamano=300, overlap=30)
+Indexados 20 vectores
 
 ======================================================================
 PREGUNTA: Cuanto cuesta enviar a Madrid?
 ======================================================================
 Fragmentos recuperados:
-  [1] score=0.612  src=envios.md          # Politica de envios de Casa Tortuga ...
-  [2] score=0.523  src=envios.md          ### Baleares y Canarias - Baleares: 8...
-  [3] score=0.501  src=envios.md          Los pedidos con importe superior a 49...
+  [1] score=0.852  ## Envio gratuito  Los pedidos con importe superior a 49 EUR (sin c...
+  [2] score=0.847  ## Como solicitar la devolucion
+  [3] score=0.835  - Madrid, Barcelona, Valencia, Sevilla: 4,90 EUR para paquetes de h...
 
 RESPUESTA:
-El envío a Madrid cuesta 4,90 EUR para paquetes de hasta 5 kg [doc 1].
+Según la información proporcionada, enviar a Madrid cuesta **4,90 EUR para paquetes de hasta 5 kg**. [doc id="3" source="envios.md"]
 
 ...
 ```
@@ -132,13 +132,14 @@ docker compose up -d
 curl http://localhost:8000/api/v2/heartbeat   # debe responder
 ```
 
-**2. Descomentar la dependencia en `pom.xml`:**
+**2. Descomentar o añadir la dependencia en `pom.xml`:**
+
+Descomenta el bloque correspondiente en el archivo `pom.xml` o añádelo sin especificar versión (ya que está gestionada por el BOM de LangChain4j):
 
 ```xml
 <dependency>
     <groupId>dev.langchain4j</groupId>
     <artifactId>langchain4j-chroma</artifactId>
-    <version>${langchain4j.version}</version>
 </dependency>
 ```
 
