@@ -45,7 +45,7 @@ cd mod5-rag-hello-world
 export ANTHROPIC_API_KEY=sk-ant-...
 
 # 3. Compilar y ejecutar
-mvn compile exec:java -q
+mvn spring-boot:run -q
 ```
 
 La primera ejecución descarga el modelo de embeddings BGE (~25 MB como recurso del JAR vía Maven). Las siguientes son inmediatas.
@@ -82,19 +82,19 @@ Las tres preguntas están diseñadas para cubrir casos distintos:
 
 ```
 Cargados 3 documentos del corpus
-Generados 5 chunks (tamano=300, overlap=30)
-Indexados 5 vectores
+Generados 20 chunks (tamano=300, overlap=30)
+Indexados 20 vectores
 
 ======================================================================
 PREGUNTA: Cuanto cuesta enviar a Madrid?
 ======================================================================
 Fragmentos recuperados:
-  [1] score=0.612  src=envios.md          # Politica de envios de Casa Tortuga ...
-  [2] score=0.523  src=envios.md          ### Baleares y Canarias - Baleares: 8...
-  [3] score=0.501  src=envios.md          Los pedidos con importe superior a 49...
+  [1] score=0.852  ## Envio gratuito  Los pedidos con importe superior a 49 EUR (sin c...
+  [2] score=0.847  ## Como solicitar la devolucion
+  [3] score=0.835  - Madrid, Barcelona, Valencia, Sevilla: 4,90 EUR para paquetes de h...
 
 RESPUESTA:
-El envío a Madrid cuesta 4,90 EUR para paquetes de hasta 5 kg [doc 1].
+Según la información proporcionada, enviar a Madrid cuesta **4,90 EUR para paquetes de hasta 5 kg**. [doc id="3" source="envios.md"]
 
 ...
 ```
@@ -135,7 +135,9 @@ docker compose up -d
 curl http://localhost:8000/api/v1/heartbeat   # debe responder
 ```
 
-**2. Descomentar la dependencia en `pom.xml`:**
+**2. Descomentar o añadir la dependencia en `pom.xml`:**
+
+Añade la dependencia de ChromaDB en el archivo `pom.xml` (la versión está gestionada por la propiedad `${langchain4j.version}`):
 
 ```xml
 <dependency>
@@ -145,20 +147,26 @@ curl http://localhost:8000/api/v1/heartbeat   # debe responder
 </dependency>
 ```
 
-**3. Sustituir el store en `HelloRag.java`:**
+**3. Sustituir el store en `RagConfig.java`:**
 
 ```java
 // Antes:
-EmbeddingStore<TextSegment> store = new InMemoryEmbeddingStore<>();
+@Bean
+public EmbeddingStore<TextSegment> embeddingStore() {
+    return new InMemoryEmbeddingStore<>();
+}
 
 // Después:
-EmbeddingStore<TextSegment> store = ChromaEmbeddingStore.builder()
-        .baseUrl("http://localhost:8000")
-        .collectionName("casa-tortuga")
-        .build();
+@Bean
+public EmbeddingStore<TextSegment> embeddingStore() {
+    return ChromaEmbeddingStore.builder()
+            .baseUrl("http://localhost:8000")
+            .collectionName("casa-tortuga")
+            .build();
+}
 ```
 
-**4. Añadir el import:**
+**4. Añadir el import en `RagConfig.java`:**
 
 ```java
 import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
@@ -167,7 +175,7 @@ import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
 **5. Reejecutar:**
 
 ```bash
-mvn -q exec:java
+mvn spring-boot:run -q
 ```
 
 El comportamiento es idéntico desde el código. La diferencia es que ahora los vectores persisten en el volumen Docker entre ejecuciones y se pueden inspeccionar vía la API HTTP de ChromaDB (`GET http://localhost:8000/api/v1/collections`).
