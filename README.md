@@ -49,6 +49,42 @@ Escribe `salir`, `exit` o `quit` para cerrar el chat.
 
 ---
 
+## Variante con ChromaDB
+
+Por defecto los vectores se almacenan en memoria y no persisten entre ejecuciones. Para usar ChromaDB con persistencia real:
+
+**1. Levantar ChromaDB:**
+
+```bash
+docker compose up -d
+```
+
+**2. Verificar que responde:**
+
+```bash
+curl http://localhost:8000/api/v2/heartbeat   # debe devolver {"nanosecond heartbeat": ...}
+```
+
+Los scripts `hello_rag.py` y `hello_rag_chat.py` ya están configurados para conectarse a ChromaDB en `localhost:8000` y usar la colección `casa-tortuga`. Los vectores persisten entre ejecuciones y se pueden inspeccionar con:
+
+```python
+import chromadb
+c = chromadb.HttpClient(host="localhost", port=8000)
+print(c.get_collection("casa-tortuga").count())
+```
+
+Para detener ChromaDB conservando los datos:
+```bash
+docker compose down
+```
+
+Para detener y borrar el volumen:
+```bash
+docker compose down -v
+```
+
+---
+
 ## Estructura de la rama
 
 - [`corpus/`](./corpus): Documentación de la tienda de ejemplo "Casa Tortuga".

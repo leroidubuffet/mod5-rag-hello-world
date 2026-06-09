@@ -3,7 +3,8 @@ import glob
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_core.vectorstores import InMemoryVectorStore
+import chromadb
+from langchain_chroma import Chroma
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
@@ -78,7 +79,12 @@ def main():
 
     # 1. Inicializar modelos
     embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
-    vector_store = InMemoryVectorStore(embeddings)
+    chroma_client = chromadb.HttpClient(host="localhost", port=8000)
+    vector_store = Chroma(
+        collection_name="casa-tortuga",
+        embedding_function=embeddings,
+        client=chroma_client,
+    )
     chat_model = ChatAnthropic(model=CHAT_MODEL_NAME, api_key=api_key, temperature=0)
 
     # 2. Ingesta e indexación de documentos
@@ -90,7 +96,7 @@ def main():
     splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP)
     chunks = splitter.split_documents(raw_docs)
     vector_store.add_documents(chunks)
-    print(f"Indexados {len(chunks)} vectores en memoria.")
+    print(f"Indexados {len(chunks)} vectores en ChromaDB.")
     print("¡Sistema RAG listo! Escribe 'salir' o 'exit' para terminar.\n")
 
     # 3. Inicializar historial de chat y leer prompt de sistema

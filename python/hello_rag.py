@@ -3,7 +3,8 @@ import glob
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_core.vectorstores import InMemoryVectorStore
+import chromadb
+from langchain_chroma import Chroma
 from langchain_anthropic import ChatAnthropic
 
 # 0. Configuración (Equivalente a application.properties)
@@ -41,7 +42,12 @@ def main():
     # 1. Inicializar modelos
     # Cargamos el mismo modelo BGE small que usa la versión de Java
     embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
-    vector_store = InMemoryVectorStore(embeddings)
+    chroma_client = chromadb.HttpClient(host="localhost", port=8000)
+    vector_store = Chroma(
+        collection_name="casa-tortuga",
+        embedding_function=embeddings,
+        client=chroma_client,
+    )
     chat_model = ChatAnthropic(model=CHAT_MODEL_NAME, api_key=api_key)
 
     # 2. Fase 1: INDEXACIÓN
