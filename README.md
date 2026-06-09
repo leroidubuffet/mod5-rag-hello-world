@@ -137,57 +137,53 @@ rag.retrieval.min_score=0.5
 
 ## Variante con ChromaDB
 
-Por defecto el store es en memoria (`InMemoryEmbeddingStore`): los vectores no persisten entre ejecuciones. Para usar ChromaDB con persistencia real:
+Por defecto el store es en memoria (`InMemoryEmbeddingStore`): los vectores no persisten entre ejecuciones. El soporte de ChromaDB ya está integrado y se activa con una propiedad, sin cambios en el código.
 
 **1. Levantar ChromaDB:**
 
 ```bash
 docker compose up -d
-curl http://localhost:8000/api/v1/heartbeat   # debe responder
+curl http://localhost:8000/api/v1/heartbeat   # debe responder {"nanosecond heartbeat": ...}
 ```
 
-**2. Añadir la dependencia en `pom.xml`:**
+El `docker-compose.yml` usa `chromadb/chroma:0.5.23`, fijado para garantizar compatibilidad con la API v1 que utiliza `langchain4j-chroma` 0.36.2.
 
-```xml
-<dependency>
-    <groupId>dev.langchain4j</groupId>
-    <artifactId>langchain4j-chroma</artifactId>
-    <version>${langchain4j.version}</version>
-</dependency>
-```
-
-**3. Sustituir el store en `RagConfig.java`:**
-
-```java
-// Antes:
-@Bean
-public EmbeddingStore<TextSegment> embeddingStore() {
-    return new InMemoryEmbeddingStore<>();
-}
-
-// Después:
-@Bean
-public EmbeddingStore<TextSegment> embeddingStore() {
-    return ChromaEmbeddingStore.builder()
-            .baseUrl("http://localhost:8000")
-            .collectionName("casa-tortuga")
-            .build();
-}
-```
-
-**4. Añadir el import en `RagConfig.java`:**
-
-```java
-import dev.langchain4j.store.embedding.chroma.ChromaEmbeddingStore;
-```
-
-**5. Reejecutar:**
+**2. Ejecutar con ChromaDB:**
 
 ```bash
-mvn spring-boot:run -q
+# Modo lote
+mvn spring-boot:run -q -Dspring-boot.run.arguments="--rag.store.type=chroma"
+
+# Modo chat
+mvn spring-boot:run -q -Dspring-boot.run.arguments="--rag.mode=chat --rag.store.type=chroma"
 ```
 
-El comportamiento es idéntico desde el código. La diferencia es que ahora los vectores persisten en el volumen Docker entre ejecuciones y se pueden inspeccionar vía la API HTTP de ChromaDB (`GET http://localhost:8000/api/v1/collections`).
+O bien activar ChromaDB de forma permanente editando `src/main/resources/application.properties`:
+
+```properties
+rag.store.type=chroma
+# rag.chroma.url=http://localhost:8000      (valor por defecto)
+# rag.chroma.collection=casa-tortuga        (valor por defecto)
+```
+
+El comportamiento es idéntico al modo memoria. En cada arranque, la colección se borra y se recrea desde el corpus para evitar duplicados. Los vectores persisten en el volumen Docker entre ejecuciones y se pueden inspeccionar vía la API de ChromaDB:
+
+```bash
+curl http://localhost:8000/api/v1/collections
+curl http://localhost:8000/api/v1/collections/casa-tortuga/count
+```
+
+Para detener ChromaDB conservando los datos:
+
+```bash
+docker compose down
+```
+
+Para detener y borrar el volumen:
+
+```bash
+docker compose down -v
+```
 
 ## Flujo del RAG (4 Fases)
 1. **Fase 1: Indexación (al arrancar)**: Carga los documentos markdown de la carpeta `/corpus`, los divide en chunks de 300 caracteres (overlap de 30), genera embeddings locales con el modelo BGE-small-en-v1.5-q y los guarda en un store en memoria.
