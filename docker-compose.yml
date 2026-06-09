@@ -13,7 +13,7 @@
 
 services:
   chromadb:
-    image: chromadb/chroma:latest
+    image: chromadb/chroma:0.5.23
     container_name: mod5-chromadb
     ports:
       - "8000:8000"
