@@ -2,7 +2,7 @@
 
 Pipeline RAG mínimo implementado en **Python (con LangChain)**. Implementa las cuatro fases del módulo 5 del curso *IA generativa en el desarrollo de software*, utilizando un corpus de ejemplo.
 
-Esta rama (`feature/python`) contiene exclusivamente la implementación de Python.
+Esta rama (`python`) contiene exclusivamente la implementación de Python.
 
 ---
 
