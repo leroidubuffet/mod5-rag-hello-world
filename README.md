@@ -49,23 +49,33 @@ Escribe `salir`, `exit` o `quit` para cerrar el chat.
 
 ---
 
-## Variante con ChromaDB
+## ChromaDB (requerido)
 
-Por defecto los vectores se almacenan en memoria y no persisten entre ejecuciones. Para usar ChromaDB con persistencia real:
+Los scripts usan ChromaDB como store de vectores. Es necesario tenerlo en marcha antes de ejecutar cualquiera de los dos scripts.
 
 **1. Levantar ChromaDB:**
 
 ```bash
 docker compose up -d
-```
-
-**2. Verificar que responde:**
-
-```bash
 curl http://localhost:8000/api/v2/heartbeat   # debe devolver {"nanosecond heartbeat": ...}
 ```
 
-Los scripts `hello_rag.py` y `hello_rag_chat.py` ya están configurados para conectarse a ChromaDB en `localhost:8000` y usar la colección `casa-tortuga`. Los vectores persisten entre ejecuciones y se pueden inspeccionar con:
+El `docker-compose.yml` usa `chromadb/chroma:latest`, compatible con el cliente Python `chromadb` 1.x (API v2).
+
+**2. Ejecutar los scripts normalmente:**
+
+```bash
+python hello_rag.py
+python hello_rag_chat.py
+```
+
+En cada arranque, la colección `casa-tortuga` se borra y se recrea desde el corpus para evitar acumulación de vectores entre ejecuciones. La colección se configura con similitud coseno (`hnsw:space=cosine`), adecuada para el modelo de embeddings BGE.
+
+Los vectores persisten en el volumen Docker y se pueden inspeccionar entre ejecuciones:
+
+```bash
+curl http://localhost:8000/api/v2/collections
+```
 
 ```python
 import chromadb
@@ -74,11 +84,13 @@ print(c.get_collection("casa-tortuga").count())
 ```
 
 Para detener ChromaDB conservando los datos:
+
 ```bash
 docker compose down
 ```
 
 Para detener y borrar el volumen:
+
 ```bash
 docker compose down -v
 ```
