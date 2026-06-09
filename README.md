@@ -10,6 +10,7 @@ Esta rama (`python`) contiene exclusivamente la implementación de Python.
 
 - **API key de Anthropic**: Necesitas una clave con acceso a Claude Haiku.
 - **Python 3.10+**
+- **Docker**: necesario para ejecutar ChromaDB.
 
 ---
 
@@ -74,7 +75,7 @@ En cada arranque, la colección `casa-tortuga` se borra y se recrea desde el cor
 Los vectores persisten en el volumen Docker y se pueden inspeccionar entre ejecuciones:
 
 ```bash
-curl http://localhost:8000/api/v2/collections
+curl http://localhost:8000/api/v2/tenants/default_tenant/databases/default_database/collections
 ```
 
 ```python
