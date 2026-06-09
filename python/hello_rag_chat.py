@@ -80,6 +80,7 @@ def main():
     # 1. Inicializar modelos
     embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
     chroma_client = chromadb.HttpClient(host="localhost", port=8000)
+    chroma_client.delete_collection("casa-tortuga")
     vector_store = Chroma(
         collection_name="casa-tortuga",
         embedding_function=embeddings,
