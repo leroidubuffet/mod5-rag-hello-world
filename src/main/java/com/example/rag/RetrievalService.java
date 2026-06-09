@@ -6,14 +6,11 @@ import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Fase 2 — RECUPERACION (por consulta):
- * Genera el embedding de la pregunta del usuario y busca los k chunks
- * mas cercanos en la base vectorial por similitud coseno.
- */
+@Service
 public class RetrievalService {
 
     private final EmbeddingModel embeddingModel;

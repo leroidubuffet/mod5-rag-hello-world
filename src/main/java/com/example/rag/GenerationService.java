@@ -1,28 +1,28 @@
 package com.example.rag;
 
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
-/**
- * Fase 3 — ENSAMBLADO y Fase 4 — GENERACION.
- */
+@Service
 public class GenerationService {
 
-    private static final Logger log = LoggerFactory.getLogger(GenerationService.class);
-
-    private final ChatModel chatModel;
+    private final ChatLanguageModel chatModel;
     private final boolean showPrompt;
     private final String systemInstruction;
 
-    public GenerationService(ChatModel chatModel, boolean showPrompt, String systemInstruction) {
+    public GenerationService(ChatLanguageModel chatModel,
+                             @Value("${rag.debug.show_prompt:false}") boolean showPrompt) {
         this.chatModel = chatModel;
         this.showPrompt = showPrompt;
-        this.systemInstruction = systemInstruction;
+        this.systemInstruction = loadSystemPrompt();
     }
 
     public String generateAnswer(String question, List<EmbeddingMatch<TextSegment>> matches) {
@@ -34,7 +34,7 @@ public class GenerationService {
             System.out.println("-------------------------------------------------------------------------------------------------");
         }
 
-        return chatModel.chat(prompt);
+        return chatModel.generate(prompt);
     }
 
     private String buildPrompt(List<EmbeddingMatch<TextSegment>> matches, String question) {
@@ -58,5 +58,17 @@ public class GenerationService {
                 .append("\n</instructions>");
 
         return sb.toString();
+    }
+
+    private String loadSystemPrompt() {
+        Path path = Path.of("system_prompt.txt");
+        if (!Files.exists(path)) {
+            path = Path.of("../system_prompt.txt");
+        }
+        try {
+            return Files.readString(path).strip();
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo leer system_prompt.txt en " + path.toAbsolutePath(), e);
+        }
     }
 }
