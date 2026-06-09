@@ -59,7 +59,7 @@ Escribe `salir`, `exit` o `quit` en la terminal para cerrar la sesión.
 ---
 
 ## Flujo del RAG (4 Fases)
-1. **Fase 1 — Indexación (al arrancar)**: Carga los documentos markdown de la carpeta `/corpus`, los divide en chunks de 300 caracteres (overlap de 30), genera embeddings locales con el modelo BGE-small-en-v1.5 y los guarda en un store en memoria.
-2. **Fase 2 — Recuperación (por pregunta)**: Genera el embedding de la pregunta y busca los top-3 fragmentos más similares.
-3. **Fase 3 — Ensamblado**: Agrupa los fragmentos recuperados con la pregunta en un prompt delimitado por etiquetas XML.
-4. **Fase 4 — Generación**: Envía el prompt a Claude Haiku y retorna la respuesta final justificando la fuente.
+1. **Fase 1: Indexación (al arrancar)**: Carga los documentos markdown de la carpeta `/corpus`, los divide en chunks de 300 caracteres (overlap de 30), genera embeddings locales con el modelo BGE-small-en-v1.5 y los guarda en un store en memoria.
+2. **Fase 2: Recuperación (por pregunta)**: Genera el embedding de la pregunta y busca los top-3 fragmentos más similares.
+3. **Fase 3: Ensamblado**: Agrupa los fragmentos recuperados con la pregunta en un prompt delimitado por etiquetas XML.
+4. **Fase 4: Generación**: Envía el prompt a Claude Haiku y retorna la respuesta final justificando la fuente.
