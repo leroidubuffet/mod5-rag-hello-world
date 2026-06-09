@@ -48,6 +48,7 @@ def main():
         collection_name="casa-tortuga",
         embedding_function=embeddings,
         client=chroma_client,
+        collection_metadata={"hnsw:space": "cosine"},
     )
     chat_model = ChatAnthropic(model=CHAT_MODEL_NAME, api_key=api_key)
 
@@ -89,7 +90,7 @@ def main():
         print("=" * 70)
 
         # Fase 2: RECUPERACIÓN (búsqueda por similitud con puntuación)
-        results = vector_store.similarity_search_with_score(question, k=K)
+        results = vector_store.similarity_search_with_relevance_scores(question, k=K)
         # Filtrar por puntuación mínima
         matches = [m for m in results if m[1] >= MIN_SCORE]
 

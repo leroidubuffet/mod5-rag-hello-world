@@ -85,6 +85,7 @@ def main():
         collection_name="casa-tortuga",
         embedding_function=embeddings,
         client=chroma_client,
+        collection_metadata={"hnsw:space": "cosine"},
     )
     chat_model = ChatAnthropic(model=CHAT_MODEL_NAME, api_key=api_key, temperature=0)
 
@@ -128,7 +129,7 @@ def main():
                 print(f"\n[Búsqueda RAG optimizada: '{search_query}']")
 
             # B. Recuperación de fragmentos
-            results = vector_store.similarity_search_with_score(search_query, k=K)
+            results = vector_store.similarity_search_with_relevance_scores(search_query, k=K)
             matches = [m for m in results if m[1] >= MIN_SCORE]
 
             # C. Construir contexto

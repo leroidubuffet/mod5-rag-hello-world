@@ -3,7 +3,7 @@
 #
 # Uso rapido:
 #   docker compose up -d
-#   curl http://localhost:8000/api/v1/heartbeat   # debe devolver {"nanosecond heartbeat": ...}
+#   curl http://localhost:8000/api/v2/heartbeat   # debe devolver {"nanosecond heartbeat": ...}
 #
 # Para detener (conservando los datos):
 #   docker compose down
@@ -23,7 +23,7 @@ services:
       - IS_PERSISTENT=TRUE
       - PERSIST_DIRECTORY=/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v2/heartbeat"]
       interval: 10s
       timeout: 5s
       retries: 5
